@@ -21,8 +21,8 @@ class Message {
 		return db.update({ _id: id }, update, {})
 	}
 
-	remove(id) {
-		return db.remove({ _id: id })
+	remove(id, callback) {
+		db.remove({ _id: id }, {}, callback)
 	}
 
 	insert(data) {

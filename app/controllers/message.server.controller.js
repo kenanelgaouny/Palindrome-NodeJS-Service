@@ -2,6 +2,7 @@
 
 const Message = require('../models/message.model');
 const _ = require('lodash');
+const utils = require('../lib/utils')
 
 const model = new Message()
 
@@ -21,7 +22,7 @@ exports.getMessages = function (req, res) {
 exports.getSingleMessage = function (req, res) {
     model.findById(req.params.id, {text: 1})
         .exec(function (err, message) {
-            if (!message || err) {
+            if (utils.isObjectEmpty(message) || err) {
                 res.status(404).send({
                     message: 'Message not found'
                 });
@@ -47,15 +48,15 @@ exports.postMessage = function (req, res) {
 exports.deleteMessage = function (req, res) {
 
     model.findById(req.params.id)
-        .exec(function (err, message) {
-            if (!message || err) {
+        .exec(function (err, docs) { // Fixed is empty check, ![] = false
+            if (utils.isObjectEmpty(docs) || err) {
                 res.status(404).send({
                     message: 'Message not found'
                 });
                 return;
             }
-
-            message.remove(function (err, removedMessage) {
+            // id was not passed in, added callback, fixed param names for clarity
+            model.remove(req.params.id, function (err, numRemoved) { 
                 if (err) {
                     res.status(500).send({
                         message: 'Database error deleting message.'
