@@ -21,16 +21,13 @@ class Message {
 		return db.update({ _id: id }, update, {})
 	}
 
-	remove(id) {
-		return db.remove({ _id: id })
+	remove(id, callback) {
+		db.remove({ _id: id }, {}, callback)
 	}
 
-	insert(data) {
-		return db.insert(data, (err, newDoc) => {
-			if (err)
-				return err
-			return newDoc
-		})
+	// previous logic does not work, returns None
+	insert(data, callback) {
+		db.insert(data, callback)
 	}
 }
 

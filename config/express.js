@@ -7,7 +7,7 @@ let express = require('express')
 let compress = require('compression')
 let methodOverride = require('method-override')
 let config = require('./config')
-let router = express.Router
+let router = express.Router() // was missing ()
 
 module.exports = function () {
 	// Initialize express app

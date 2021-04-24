@@ -1,7 +1,7 @@
 const config = require('./config/config')
 
 // Init the express application
-const app = require('./config/config/express')()
+const app = require('./config/express')()
 
 // Start the app by listening on <port>
 app.listen(config.port)
@@ -16,4 +16,4 @@ process.on('SIGINT', function () {
 exports = module.exports = app
 
 // Logging initialization
-console.log('Starting server on port 9090')
+console.log(`Starting server on port ${config.port}`) // port was incorrect config.port=9091
