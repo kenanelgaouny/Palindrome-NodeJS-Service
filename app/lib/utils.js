@@ -7,7 +7,12 @@ exports.isObjectEmpty = function (obj){
 exports.isPalindrome = function (message){
     var msg = message.replace(/\s/g, ""); //supports phrases
     var msgList = msg.split('')
-    var msgListReverse = msg.split('').reverse()
-    return msgList === msgListReverse
+    var halflen = Math.floor(msgList.length)
+    for(var i = 0; i < halflen; i++ ){
+        if (msgList[i] !== msgList[msgList.length -i -1]){
+            return false
+        }
+    }
+    return true
 }
 

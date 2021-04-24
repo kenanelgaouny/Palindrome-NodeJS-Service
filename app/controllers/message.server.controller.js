@@ -31,9 +31,32 @@ exports.getSingleMessage = function (req, res) {
     });
 };
 
+function addPalindrome(item){
+    if(!item.hasOwnProperty('text')){
+        return "Property \'text\' not found in payload object";
+    }
+    item.palindrome = utils.isPalindrome(item.text);
+}
+
 // Post now returns the added message, handle uniqueViolated
 exports.postMessage = function (req, res) {
     console.log(req.body)
+    var errAdding;
+    if (Array.isArray(req.body)){
+        for (var i in req.body){
+            errAdding = addPalindrome(req.body[i]);
+            if (errAdding) {break;}
+        }
+    }else{
+        errAdding = addPalindrome(req.body);
+    }
+
+    if(errAdding){
+        res.status(500).send({
+            message: errAdding 
+        });
+        return;
+    }
     model.insert(req.body, function(err, savedMessage){ 
         if (err){
             console.log(err)
@@ -41,7 +64,7 @@ exports.postMessage = function (req, res) {
             if (err.errorType === 'uniqueViolated'){
                 errmsg = 'Message already exists.';
             }
-            res.status(500).send({
+            res.status(400).send({
                 message: errmsg
             });
             return;
