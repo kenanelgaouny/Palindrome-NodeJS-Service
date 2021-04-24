@@ -1,7 +1,6 @@
 'use strict';
 
 const Message = require('../models/message.model');
-const _ = require('lodash');
 const utils = require('../lib/utils')
 
 const model = new Message()
@@ -32,17 +31,23 @@ exports.getSingleMessage = function (req, res) {
     });
 };
 
+// Post now returns the added message, handle uniqueViolated
 exports.postMessage = function (req, res) {
     console.log(req.body)
-    let savedMessage = model.insert(req.body)
-    if (_.isError(savedMessage)) {
-        res.status(500).send({
-            message: 'Database error saving new message.'
-        });
-        return;
-    }
-
-    res.json(savedMessage);
+    model.insert(req.body, function(err, savedMessage){ 
+        if (err){
+            console.log(err)
+            var errmsg = 'Database error saving new message.';
+            if (err.errorType === 'uniqueViolated'){
+                errmsg = 'Message already exists.';
+            }
+            res.status(500).send({
+                message: errmsg
+            });
+            return;
+        }
+        res.json(savedMessage);
+    })    
 };
 
 exports.deleteMessage = function (req, res) {
