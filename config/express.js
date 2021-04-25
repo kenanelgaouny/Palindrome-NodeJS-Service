@@ -8,6 +8,7 @@ let compress = require('compression')
 let methodOverride = require('method-override')
 let config = require('./config')
 let router = express.Router() // was missing ()
+let prom = require('prom-client');
 
 module.exports = function () {
 	// Initialize express app
@@ -17,6 +18,9 @@ module.exports = function () {
 	app.locals.title = config.app.title;
 	app.locals.description = config.app.description;
 	app.locals.keywords = config.app.keywords;
+
+	// prometheus 
+	prom.collectDefaultMetrics();
 
 	// Passing the request url to environment locals
 	app.use(function (req, res, next) {
@@ -43,7 +47,16 @@ module.exports = function () {
 	app.use(methodOverride())
 
 	// Routes definition
+	app.get('/metrics', async (req, res) => {
+		try {
+			res.set('Content-Type', prom.register.contentType);
+			res.end(await prom.register.metrics());
+		} catch (ex) {
+			res.status(500).end(ex);
+		}
+	});
 	router.use('/api/v1', require('../app/routes/message.server.routes'))
+	router.use('/api/v1', require('../app/routes/health.server.routes'))
 	app.use(router)
 
 	// Assume 'not found' in the error msgs is a 404.
