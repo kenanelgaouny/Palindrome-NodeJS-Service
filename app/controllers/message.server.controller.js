@@ -1,7 +1,7 @@
 'use strict';
 
 const Message = require('../models/message.model');
-const utils = require('../lib/utils')
+const utils = require('../lib/util')
 const model = Message
 
 exports.getMessages = function (req, res) {
