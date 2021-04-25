@@ -44,6 +44,7 @@ module.exports = function () {
 
 	// Routes definition
 	router.use('/api/v1', require('../app/routes/message.server.routes'))
+	router.use('/api/v1', require('../app/routes/health.server.routes'))
 	app.use(router)
 
 	// Assume 'not found' in the error msgs is a 404.

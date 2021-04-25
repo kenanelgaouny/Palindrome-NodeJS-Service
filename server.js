@@ -3,6 +3,17 @@ const config = require('./config/config')
 // Init the express application
 const app = require('./config/express')()
 
+// connect to mongoDB
+const mongoose = require('mongoose')
+const mongoURL = `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASS}@mongocluster1.1b0kw.mongodb.net/PalindromesDB?retryWrites=true&w=majority`
+const mongoOptions = { 
+	useNewUrlParser: true, 
+	useUnifiedTopology: true, 
+	useCreateIndex: true 
+}
+mongoose.connect(mongoURL, mongoOptions);
+
+
 // Start the app by listening on <port>
 app.listen(config.port)
 
