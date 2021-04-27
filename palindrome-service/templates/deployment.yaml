@@ -1,0 +1,70 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: palindrome-service
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: {{ .Values.label }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.appPort }}
+      targetPort: {{ .Values.appPort }}
+      nodePort: {{ .Values.nodePort }}
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongocreds
+type: Opaque
+data:
+  user: UGFsaW5kcm9tZVVzZXI= 
+  password: MTIz    
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: palindrome-app
+  labels:
+    app: {{ .Values.label }}
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: {{ .Values.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.label }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: {{ .Values.appPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+        env:
+        - name: MONGOUSER
+          valueFrom:
+            secretKeyRef:
+              name: mongocreds
+              key: user
+        - name: MONGOPASS
+          valueFrom:
+            secretKeyRef:
+              name: mongocreds
+              key: password
+        ports:  
+        - containerPort: {{ .Values.appPort }}
+      
+
+      
